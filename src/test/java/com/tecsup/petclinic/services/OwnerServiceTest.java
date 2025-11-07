@@ -42,7 +42,7 @@ public class OwnerServiceTest {
 
     @Test
     public void testFindOwnerByFirstName(){
-        log.info("Test: encontrar owner por firstName");
+        log.info("Test: encontrar owners por firstName");
 
         String FIND_FIRST_NAME = "George";
         int SIZE_EXPECTED = 1;
