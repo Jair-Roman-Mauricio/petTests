@@ -91,6 +91,55 @@ public class OwnerServiceTest {
             log.info("Owner:{}",owner);
         });
     }
+    @Test
+    public void testDeleteOwner() {
+        log.info("Test: eliminar owner");
+
+        String FIRST_NAME = "TestOwner";
+        String LAST_NAME = "ToDelete";
+        String ADDRESS = "123 Test Street";
+        String CITY = "Test City";
+        String TELEPHONE = "9876543210";
+
+        OwnerDto ownerToDelete = new OwnerDto();
+        ownerToDelete.setFirstName(FIRST_NAME);
+        ownerToDelete.setLastName(LAST_NAME);
+        ownerToDelete.setAddress(ADDRESS);
+        ownerToDelete.setCity(CITY);
+        ownerToDelete.setTelephone(TELEPHONE);
+
+        try {
+            OwnerDto createdOwner = this.ownerService.create(ownerToDelete);
+            log.info("Owner creado con ID: {}", createdOwner.getId());
+            assertNotNull(createdOwner.getId(), "El ID del owner creado no debe ser null");
+
+            this.ownerService.delete(createdOwner.getId());
+            log.info("Owner eliminado con ID: {}", createdOwner.getId());
+
+            assertThrows(OwnerNotFoundException.class, () -> {
+                this.ownerService.finById(createdOwner.getId());
+            }, "Debe lanzar OwnerNotFoundException al buscar un owner eliminado");
+
+        } catch (OwnerNotFoundException e) {
+            fail("No debería lanzar excepción durante la creación o eliminación: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFindOwnerByIdNotFound() {
+        log.info("Test: buscar owner con ID inexistente");
+
+        Integer ID_NOT_EXIST = 999999;
+
+        log.info("Buscando owner con ID inexistente: {}", ID_NOT_EXIST);
+
+        assertThrows(OwnerNotFoundException.class, () -> {
+            this.ownerService.finById(ID_NOT_EXIST);
+        }, "Debe lanzar OwnerNotFoundException cuando el owner no existe");
+
+        log.info("Excepción OwnerNotFoundException lanzada correctamente");
+    }
+
 
 
 }
