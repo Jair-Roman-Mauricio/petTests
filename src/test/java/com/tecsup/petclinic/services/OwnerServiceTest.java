@@ -140,6 +140,86 @@ public class OwnerServiceTest {
         log.info("Excepción OwnerNotFoundException lanzada correctamente");
     }
 
+    @Test
+    public void testCreateOwner() {
+        log.info("Test: crear un nuevo owner");
 
+        String FIRST_NAME = "Juan";
+        String LAST_NAME = "Pérez";
+        String ADDRESS = "Av. Principal 123";
+        String CITY = "Lima";
+        String TELEPHONE = "987654321";
+
+        OwnerDto newOwner = new OwnerDto();
+        newOwner.setFirstName(FIRST_NAME);
+        newOwner.setLastName(LAST_NAME);
+        newOwner.setAddress(ADDRESS);
+        newOwner.setCity(CITY);
+        newOwner.setTelephone(TELEPHONE);
+
+        OwnerDto createdOwner = this.ownerService.create(newOwner);
+        log.info("Owner creado: {}", createdOwner);
+
+        assertNotNull(createdOwner, "El owner creado no debe ser null");
+        assertNotNull(createdOwner.getId(), "El ID del owner no debe ser null");
+        assertEquals(FIRST_NAME, createdOwner.getFirstName(), "El nombre debe coincidir");
+        assertEquals(LAST_NAME, createdOwner.getLastName(), "El apellido debe coincidir");
+        assertEquals(ADDRESS, createdOwner.getAddress(), "La dirección debe coincidir");
+        assertEquals(CITY, createdOwner.getCity(), "La ciudad debe coincidir");
+        assertEquals(TELEPHONE, createdOwner.getTelephone(), "El teléfono debe coincidir");
+
+        try {
+            OwnerDto foundOwner = this.ownerService.finById(createdOwner.getId());
+            assertNotNull(foundOwner, "El owner debe existir en la base de datos");
+            assertEquals(createdOwner.getId(), foundOwner.getId(), "Los IDs deben coincidir");
+        } catch (OwnerNotFoundException e) {
+            fail("El owner creado debería existir en la base de datos");
+        }
+    }
+
+    @Test
+    public void testUpdateOwner() {
+        log.info("Test: actualizar un owner existente");
+
+        String FIRST_NAME_ORIGINAL = "María";
+        String LAST_NAME_ORIGINAL = "García";
+        String ADDRESS_ORIGINAL = "Calle Falsa 456";
+        String CITY_ORIGINAL = "Arequipa";
+        String TELEPHONE_ORIGINAL = "912345678";
+
+        OwnerDto newOwner = new OwnerDto();
+        newOwner.setFirstName(FIRST_NAME_ORIGINAL);
+        newOwner.setLastName(LAST_NAME_ORIGINAL);
+        newOwner.setAddress(ADDRESS_ORIGINAL);
+        newOwner.setCity(CITY_ORIGINAL);
+        newOwner.setTelephone(TELEPHONE_ORIGINAL);
+
+        OwnerDto createdOwner = this.ownerService.create(newOwner);
+        log.info("Owner creado para actualizar: {}", createdOwner);
+
+        String FIRST_NAME_UPDATED = "María Elena";
+        String TELEPHONE_UPDATED = "999888777";
+
+        createdOwner.setFirstName(FIRST_NAME_UPDATED);
+        createdOwner.setTelephone(TELEPHONE_UPDATED);
+
+        OwnerDto updatedOwner = this.ownerService.update(createdOwner);
+        log.info("Owner actualizado: {}", updatedOwner);
+
+        assertNotNull(updatedOwner, "El owner actualizado no debe ser null");
+        assertEquals(createdOwner.getId(), updatedOwner.getId(), "El ID debe ser el mismo");
+        assertEquals(FIRST_NAME_UPDATED, updatedOwner.getFirstName(), "El nombre debe estar actualizado");
+        assertEquals(TELEPHONE_UPDATED, updatedOwner.getTelephone(), "El teléfono debe estar actualizado");
+        assertEquals(LAST_NAME_ORIGINAL, updatedOwner.getLastName(), "El apellido no debe cambiar");
+        assertEquals(CITY_ORIGINAL, updatedOwner.getCity(), "La ciudad no debe cambiar");
+
+        try {
+            OwnerDto foundOwner = this.ownerService.finById(updatedOwner.getId());
+            assertEquals(FIRST_NAME_UPDATED, foundOwner.getFirstName(), "El nombre actualizado debe persistir");
+            assertEquals(TELEPHONE_UPDATED, foundOwner.getTelephone(), "El teléfono actualizado debe persistir");
+        } catch (OwnerNotFoundException e) {
+            fail("El owner actualizado debería existir en la base de datos");
+        }
+    }
 
 }
